@@ -2,6 +2,7 @@
 Tests for matching algorithms.
 
 """
+import numpy as np
 from numpy.testing import assert_array_equal
 
 from matching import deferred_acceptance
@@ -78,9 +79,10 @@ class TestDeferredAcceptanceManyToOne:
         '''Setup preference order lists'''
         # From http://www.columbia.edu/~js1353/pubs/qst-many-to-one.pdf
         # Originally from Gusfield and Irving (1989, Section 1.6.5)
+        self.num_s, self.num_c = 11, 5
 
         # Students' preference orders over colleges 0, ..., 4 and unmatched
-        s_unmatched = 5
+        s_unmatched = self.num_c
         self.s_prefs = [[2, 0, 4, 3, s_unmatched, 1],
                         [0, 2, 3, 1, 4, s_unmatched],
                         [3, 4, 2, 0, 1, s_unmatched],
@@ -93,7 +95,7 @@ class TestDeferredAcceptanceManyToOne:
                         [2, 0, 4, 1, 3, s_unmatched],
                         [4, 3, 0, 2, 1, s_unmatched]]
         # Colleges' preference orders over students 0, ..., 10 and unmatched
-        c_unmatched = 11
+        c_unmatched = self.num_s
         self.c_prefs = [[2, 6, 8, 10, 4, 3, 9, 7, 5, 0, 1, c_unmatched],
                         [4, 6, 9, 5, 7, 1, 2, 10, c_unmatched, 0, 3, 8],
                         [10, 5, 7, 2, 1, 3, 6, 0, 9, c_unmatched, 4, 8],
@@ -106,14 +108,19 @@ class TestDeferredAcceptanceManyToOne:
 
         # Unique stable matching
         self.s_matched = [2, 0, 3, 2, 0, 2, 1, 0, 3, 0, 4]
-        self.c_matched = [4, 9, 7, 1, 6, 5, 3, 0, 8, 2, 10]
+        self.c_matched = [1, 4, 7, 9, 6, 0, 3, 5, 2, 8, 10]
 
     def test_student_proposal(self):
         s_matched_computed, c_matched_computed, indptr_computed = \
             deferred_acceptance(self.s_prefs, self.c_prefs, self.caps)
         assert_array_equal(s_matched_computed, self.s_matched)
-        assert_array_equal(c_matched_computed, self.c_matched)
         assert_array_equal(indptr_computed, self.indptr)
+
+        # Sort c_matched_computed for each college
+        c_matched_sorted = np.array(c_matched_computed, copy=True)
+        for j in range(self.num_c):
+            c_matched_sorted[self.indptr[j]:self.indptr[j+1]].sort()
+        assert_array_equal(c_matched_sorted, self.c_matched)
 
 
 if __name__ == '__main__':
