@@ -92,7 +92,7 @@ class TestDeferredAcceptanceManyToOne:
                         [3, 0, 4, s_unmatched, 1, 2],
                         [2, 0, 4, 1, 3, s_unmatched],
                         [4, 3, 0, 2, 1, s_unmatched]]
-        # Colleges' preference orders over students 0, ..., 11 and unmatched
+        # Colleges' preference orders over students 0, ..., 10 and unmatched
         c_unmatched = 11
         self.c_prefs = [[2, 6, 8, 10, 4, 3, 9, 7, 5, 0, 1, c_unmatched],
                         [4, 6, 9, 5, 7, 1, 2, 10, c_unmatched, 0, 3, 8],
@@ -106,7 +106,7 @@ class TestDeferredAcceptanceManyToOne:
 
         # Unique stable matching
         self.s_matched = [2, 0, 3, 2, 0, 2, 1, 0, 3, 0, 4]
-        self.u_matched = [4, 9, 7, 1, 6, 5, 3, 0, 8, 2, 10]
+        self.c_matched = [4, 9, 7, 1, 6, 5, 3, 0, 8, 2, 10]
 
     def test_student_proposal(self):
         s_matched_computed, c_matched_computed, indptr_computed = \
