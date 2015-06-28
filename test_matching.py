@@ -102,7 +102,7 @@ class TestDeferredAcceptanceManyToOne:
                         [9, 0, 1, 10, 3, 8, 4, 2, 5, 7, c_unmatched, 6],
                         [1, 3, 9, 6, 5, 0, 7, 2, 10, 8, c_unmatched, 4]]
 
-        # Capacities for females
+        # Capacities for colleges
         self.caps = [4, 1, 3, 2, 1]
         self.indptr = [0, 4, 5, 8, 10, 11]
 
