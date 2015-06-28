@@ -46,8 +46,11 @@ def deferred_acceptance(prop_prefs, resp_prefs):
     resp_prefs = np.asarray(resp_prefs)
     num_props, num_resps = prop_prefs.shape[0], resp_prefs.shape[0]
 
+    if not (prop_prefs.shape == (num_props, num_resps+1) and
+            resp_prefs.shape == (num_resps, num_props+1)):
+        raise ValueError('shapes of the input arrays do not match')
+
     # Convert preference orders to rankings
-    # resp_ranks = np.argsort(resp_prefs, axis=-1)
     resp_ranks = np.empty((num_resps, num_props+1), dtype=int)
     prefs2ranks(resp_prefs, out=resp_ranks)
 
