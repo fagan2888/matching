@@ -9,10 +9,14 @@ Tools for matching algorithms.
 import numpy as np
 
 
-def random_prefs(m, n, allow_unmatched=True):
+def random_prefs(m, n, allow_unmatched=True, return_caps=False):
     """
     Generate random preference order lists for two groups, say, m males
     and n females.
+
+    return_caps should be set True in the context of college admissions,
+    in which case "males" and "females" should be read as "students" and
+    "colleges", respectively, where each college has its capacity.
 
     Each male has a preference order over femals [0, ..., n-1] and
     "unmatched" which is represented by n, while each female has a
@@ -32,6 +36,9 @@ def random_prefs(m, n, allow_unmatched=True):
         where n and m are always placed in the last place, repectively
         (i.e., "unmatched" is least preferred by every individual).
 
+    return_caps : bool, optional(default=False)
+        If True, caps is also returned.
+
     Returns
     -------
     m_prefs : ndarray(int, ndim=2)
@@ -41,6 +48,10 @@ def random_prefs(m, n, allow_unmatched=True):
     f_prefs : ndarray(int, ndim=2)
         Array of shape (n, m+1), where each row contains a random
         permutation of 0, ..., m-1, m.
+
+    caps : ndarray(int, ndim=1)
+        Array of shape (m,) containing each female's (or college's)
+        capacity. Returned only when return_caps is True.
 
     Examples
     --------
@@ -66,15 +77,52 @@ def random_prefs(m, n, allow_unmatched=True):
            [1, 0, 2, 3, 4],
            [1, 3, 0, 2, 4]])
 
+    >>> s_prefs, c_prefs, caps = random_prefs(4, 3, return_caps=True)
+    >>> s_prefs
+    array([[0, 1, 2, 3],
+           [0, 3, 2, 1],
+           [2, 3, 0, 1],
+           [0, 2, 3, 1]])
+    >>> c_prefs
+    array([[3, 0, 4, 1, 2],
+           [3, 1, 2, 0, 4],
+           [1, 3, 2, 0, 4]])
+    >>> caps
+    array([2, 3, 1])
+
     """
-    m_prefs = np.tile(np.arange(n+1), (m, 1))
-    f_prefs = np.tile(np.arange(m+1), (n, 1))
+    m_prefs = _random_prefs(m, n, allow_unmatched=allow_unmatched,
+                            return_caps=False)
+    if not return_caps:
+        f_prefs = _random_prefs(n, m, allow_unmatched=allow_unmatched,
+                                return_caps=False)
+        return m_prefs, f_prefs
+    else:
+        f_prefs, caps = _random_prefs(n, m, allow_unmatched=allow_unmatched,
+                                      return_caps=True)
+        return m_prefs, f_prefs, caps
 
-    stop = None if allow_unmatched else -1
 
+def _random_prefs(m, n, allow_unmatched, return_caps):
+    unmatched = n
+
+    prefs = np.tile(np.arange(n+1), (m, 1))
     for i in range(m):
-        np.random.shuffle(m_prefs[i, :stop])
-    for j in range(n):
-        np.random.shuffle(f_prefs[j, :stop])
+        np.random.shuffle(prefs[i, :-1])
 
-    return m_prefs, f_prefs
+    if allow_unmatched:
+        unmatched_rankings = np.random.randint(1, n+1, size=m)
+        swapped = prefs[np.arange(m), unmatched_rankings]
+        prefs[:, -1] = swapped
+        prefs[np.arange(m), unmatched_rankings] = unmatched
+    elif return_caps:
+        unmatched_rankings = np.ones(m, dtype=int) * n
+
+    if return_caps:
+        u = np.random.random_sample(size=m)
+        caps = np.floor(unmatched_rankings*u + 1).astype(int)
+
+    if return_caps:
+        return prefs, caps
+    else:
+        return prefs
