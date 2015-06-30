@@ -14,14 +14,14 @@ def random_prefs(m, n, allow_unmatched=True, return_caps=False):
     Generate random preference order lists for two groups, say, m males
     and n females.
 
-    return_caps should be set True in the context of college admissions,
-    in which case "males" and "females" should be read as "students" and
-    "colleges", respectively, where each college has its capacity.
-
     Each male has a preference order over femals [0, ..., n-1] and
     "unmatched" which is represented by n, while each female has a
     preference order over males [0, ..., m-1] and "unmatched" which is
     represented by m.
+
+    return_caps should be set True in the context of college admissions,
+    in which case "males" and "females" should be read as "students" and
+    "colleges", respectively, where each college has its capacity.
 
     Parameters
     ----------
