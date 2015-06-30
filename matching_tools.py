@@ -115,14 +115,16 @@ def _random_prefs(m, n, allow_unmatched, return_caps):
         swapped = prefs[np.arange(m), unmatched_rankings]
         prefs[:, -1] = swapped
         prefs[np.arange(m), unmatched_rankings] = unmatched
-    elif return_caps:
+
+    if not return_caps:
+        return prefs
+
+    # return_caps
+
+    if not allow_unmatched:
         unmatched_rankings = np.ones(m, dtype=int) * n
 
-    if return_caps:
-        u = np.random.random_sample(size=m)
-        caps = np.floor(unmatched_rankings*u + 1).astype(int)
+    u = np.random.random_sample(size=m)
+    caps = np.floor(unmatched_rankings*u + 1).astype(int)
 
-    if return_caps:
-        return prefs, caps
-    else:
-        return prefs
+    return prefs, caps
