@@ -7,6 +7,7 @@ Tools for matching algorithms.
 
 """
 import numpy as np
+from numba import jit
 
 
 def random_prefs(m, n, allow_unmatched=True, return_caps=False):
@@ -107,8 +108,7 @@ def _random_prefs(m, n, allow_unmatched, return_caps):
     unmatched = n
 
     prefs = np.tile(np.arange(n+1), (m, 1))
-    for i in range(m):
-        np.random.shuffle(prefs[i, :-1])
+    _shuffle2d(prefs[:, :-1])
 
     if allow_unmatched:
         unmatched_rankings = np.random.randint(1, n+1, size=m)
@@ -128,3 +128,28 @@ def _random_prefs(m, n, allow_unmatched, return_caps):
     caps = np.floor(unmatched_rankings*u + 1).astype(int)
 
     return prefs, caps
+
+
+@jit
+def _shuffle2d(a):
+    """
+    Shuffle each row of a 2D array in place.
+
+    Parameters
+    ----------
+    a : ndarray(ndim=2)
+        Array to be shuffled.
+
+    Returns
+    -------
+    None
+
+    """
+    m, n = a.shape
+    r = np.random.random_sample(size=(m, n-1))
+
+    # From https://en.wikipedia.org/wiki/Fisher-Yates_shuffle
+    for i in range(m):
+        for j in range(n-1):
+            idx = int(np.floor(r[i, j] * (n-j)))
+            a[i, idx], a[i, n-j-1] = a[i, n-j-1], a[i, idx]
