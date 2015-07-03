@@ -24,6 +24,16 @@ class TestRandomPrefsOneToOne:
             assert_array_equal(prefs_array.shape,
                                (self.nums[i % 2], self.nums[(i+1) % 2] + 1))
 
+    def test_permutation(self):
+        prefs_arrays_all = self.prefs_arrays + self.prefs_arrays_allowed
+        sorted_arrays = [
+            np.tile(np.arange(self.nums[(i+1) % 2] + 1), (self.nums[i % 2], 1))
+            for i in range(2)
+        ]
+        for i, prefs_array in enumerate(prefs_arrays_all):
+            assert_array_equal(np.sort(prefs_array, axis=-1),
+                               sorted_arrays[i % 2])
+
     def test_unmatched_not_allowed(self):
         for prefs, unmatched in zip(self.prefs_arrays, self.unmatched_IDs):
             ok_(np.all(prefs[:, -1] == unmatched))
@@ -52,6 +62,17 @@ class TestRandomPrefsManyToOne:
                                (self.nums[i % 2], self.nums[(i+1) % 2] + 1))
         for caps in (self.caps, self.caps_allowed):
             eq_(len(caps), self.nums[1])
+
+    def test_permutation(self):
+        prefs_arrays_all = (self.s_prefs, self.c_prefs,
+                            self.s_prefs_allowed, self.c_prefs_allowed)
+        sorted_arrays = [
+            np.tile(np.arange(self.nums[(i+1) % 2] + 1), (self.nums[i % 2], 1))
+            for i in range(2)
+        ]
+        for i, prefs_array in enumerate(prefs_arrays_all):
+            assert_array_equal(np.sort(prefs_array, axis=-1),
+                               sorted_arrays[i % 2])
 
     def test_unmatched_not_allowed(self):
         prefs_arrays = (self.s_prefs, self.c_prefs)
