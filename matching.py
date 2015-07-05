@@ -81,12 +81,12 @@ def deferred_acceptance(prop_prefs, resp_prefs, caps=None):
     next_resp = np.zeros(num_props, dtype=int)
 
     # Set up index pointers
-    if caps is not None:  # Many-to-one
+    if caps is None:  # One-to-one
+        indptr = np.arange(num_resps+1)
+    else:  # Many-to-one
         indptr = np.empty(num_resps+1, dtype=int)
         indptr[0] = 0
         np.cumsum(caps, out=indptr[1:])
-    else:  # One-to-one
-        indptr = np.arange(num_resps+1)
 
     num_caps = indptr[-1]
 
